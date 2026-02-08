@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Contact {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Core fields
+  firstName   String
+  lastName    String
+  email       String?
+  phone       String?
+  notes       String?
+
+  // LinkedIn fields
+  linkedinUrl String?
+  headline    String?
+  company     String?
+  title       String?
+  location    String?
+  linkedinSyncedAt DateTime?
+
+  // Industry categorization
+  industry String @default("Other")
+
+  // Interaction tracking
+  interactions Interaction[]
+
+  @@index([industry])
+  @@index([lastName, firstName])
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  date      DateTime @default(now())
+  type      String   // email, call, meeting, linkedin, other
+  summary   String
+  contactId String
+  contact   Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([contactId])
+  @@index([date])
+}
